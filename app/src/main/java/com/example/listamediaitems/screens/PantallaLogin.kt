@@ -1,13 +1,11 @@
 package com.example.listamediaitems.screens
 
 import android.content.Context
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.*
@@ -19,13 +17,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.example.listamediaitems.PantallaPrincipal
 import com.example.listamediaitems.User
-import com.google.gson.Gson
+import com.example.listamediaitems.addUser
+import com.example.listamediaitems.leerUsuarios
 import java.io.*
 
 
 @Composable
-fun Milogin(context: Context) {
+fun Milogin(context: Context, navController: NavHostController) {
     var usuario by remember {
         mutableStateOf("")
     }
@@ -33,7 +34,8 @@ fun Milogin(context: Context) {
     var password by remember {
         mutableStateOf("")
     }
-    var showMensaje by remember { mutableStateOf(true)}
+    var showMensaje by remember { mutableStateOf(false)}
+    var mensajeAMostrar by remember { mutableStateOf("")}
     Column(
         modifier = Modifier
             .fillMaxSize(),
@@ -64,17 +66,29 @@ fun Milogin(context: Context) {
         Row {
             Button(onClick = {
                 var users = leerUsuarios(context)
-                if (users.contains(User(usuario, password))){
-                    //TODO REALIZAR NAVEGACION
+                var user = User(usuario, password)
+                if (users.contains(user)){
+                    navController.navigate(misScreens.PantallaListaItems.ruta)
                 }
                 else{
                     showMensaje = true
+                    mensajeAMostrar = "No existe el usuario"
                 }
             }) {
                 Text(text = "Aceptar")
             }
             Spacer(modifier = Modifier.width(5.dp))
-            Button(onClick = { addUser(usuario, password, context) }) {
+            Button(onClick = {
+                if (addUser(usuario, password, context)){
+                    mensajeAMostrar = "Usuario creado"
+                    usuario = ""
+                    password = ""
+                    }
+                else{
+                    mensajeAMostrar = "Ese usuario ya existe"
+                    }
+                showMensaje = true
+            }) {
                 Text(text = "Nuevo usuario")
             }
         }
@@ -88,9 +102,12 @@ fun Milogin(context: Context) {
                         .padding(start = 10.dp, end = 10.dp)
                         .fillMaxWidth()
                     ) {
-                    Row {
-                        Text(text = "El usuario no esta registrado",
-                        Modifier.clickable { showMensaje=false })
+                    Row (horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.clickable { showMensaje=false }
+                    ){
+                        Text(text = mensajeAMostrar,
+                            color = Color.White
+                        )
                     }
                 }
             }
@@ -98,33 +115,4 @@ fun Milogin(context: Context) {
     }
 }
 
-fun addUser(usuario: String, password: String, context: Context) {
-    var user = User(usuario, password)
-    val userJson = Gson().toJson(user)
-    val file = File(context.getExternalFilesDir(null), "users.txt")
-    if (file == null) {
-        file.createNewFile()
-    }
-    val fileWriter = FileWriter(file, true)
-    fileWriter.append(userJson + "\n")
-    fileWriter.close()
-}
 
-fun leerUsuarios(context: Context): MutableList<User> {
-    val usuarios = mutableListOf<User>()
-    val file = File(context.getExternalFilesDir(null), "users.txt")
-    try {
-        val buffer: BufferedReader =
-            File(context.getExternalFilesDir(null), "users.txt").bufferedReader()
-
-        buffer.useLines {
-                lines -> lines.forEach { v ->
-                val user = Gson().fromJson(v, User::class.java)
-                    usuarios.add(user)
-                }
-        }
-    } catch (e: IOException) {
-        e.printStackTrace()
-    }
-    return usuarios
-}

@@ -8,7 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
-import com.example.listamediaitems.screens.Milogin
+import androidx.navigation.compose.rememberNavController
+import com.example.listamediaitems.screens.navHost
 import com.example.listamediaitems.ui.theme.ListaMediaItemsTheme
 
 class MainActivity : ComponentActivity() {
@@ -23,8 +24,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
+                    val navController = rememberNavController()
                     context = applicationContext
-                    Milogin(context)
+                    navHost(context, navController)
                 }
             }
         }

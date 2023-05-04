@@ -1,7 +1,5 @@
 package com.example.listamediaitems
 
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 data class MediaItem(
     val id: Int,
@@ -11,9 +9,7 @@ data class MediaItem(
     val descipcion:String
 ){
     enum class Type {PHOTO,VIDEO}
-    fun toJson():String {
-        return Json.encodeToString(this)
-    }
+
 }
 fun getMediaItem() = (1..10).map {
     MediaItem(

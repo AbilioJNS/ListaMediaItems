@@ -21,9 +21,6 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.listamediaitems.screens.misScreens
 import com.google.gson.Gson
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
 @Composable
 fun PantallaPrincipal(navController: NavHostController) {
